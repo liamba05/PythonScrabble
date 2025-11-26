@@ -43,10 +43,10 @@ class Board(object):
         special_tile_color = {
                             ' ': '',
                             'W': Fore.RED,
-                            'w': Fore.MAGENTA,
+                            'w': Fore.GREEN,
                             'L': Fore.BLUE,
-                            'l': Fore.CYAN,
-                            '*': Fore.MAGENTA,
+                            'l': Fore.YELLOW,
+                            '*': Fore.WHITE,
                             }
 
         string_rep = "   " + ' '.join([str(hex(x))[-1] for x in range(15)]) + "\n"
