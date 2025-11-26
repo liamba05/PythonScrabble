@@ -1,5 +1,6 @@
 from game.scrabble_box import Board, Rulebook, TileBag
 from game.scrabble_players import HumanPlayer, ComputerPlayer
+from game.q_learning_player import QLearningPlayer
 from random import shuffle
 
 import sys
@@ -12,10 +13,11 @@ class GameMaster(object):
     It is also responsible for the creation of players, and cycling through them at appropriate intervals.
     """
 
-    def __init__(self, human_count=0, computer_count=0):
+    def __init__(self, human_count=0, computer_count=0, use_q_learning=False):
         """
         :param human_count: The number of human players to be
         :param computer_count: The number of AI players.
+        :param use_q_learning: If True, computer players will be QLearningPlayer.
         """
         # Generate the game pieces.
         self.rulebook = Rulebook()
@@ -24,6 +26,7 @@ class GameMaster(object):
         self.players = []
         self.player_scores = []
         self.human_count, self.computer_count = human_count, computer_count
+        self.use_q_learning = use_q_learning
 
     def reset_game(self):
         """ Reset the board and tiles games """
@@ -31,8 +34,12 @@ class GameMaster(object):
         self.bag = TileBag()
         self.players = []
         for i in range(self.computer_count):
-            self.players.append(ComputerPlayer(id=1 + self.human_count + i, init_tiles=self.bag.grab(7),
-                                               rulebook=self.rulebook, name="Computer {}".format(i + 1)))
+            if self.use_q_learning:
+                self.players.append(QLearningPlayer(id=1 + self.human_count + i, init_tiles=self.bag.grab(7),
+                                                   rulebook=self.rulebook, name="QLearningBot {}".format(i + 1)))
+            else:
+                self.players.append(ComputerPlayer(id=1 + self.human_count + i, init_tiles=self.bag.grab(7),
+                                                   rulebook=self.rulebook, name="Computer {}".format(i + 1)))
         for i in range(self.human_count):
             self.players.append(HumanPlayer(id=i + 1, init_tiles=self.bag.grab(7), rulebook=self.rulebook))
         self.player_scores = [0 for _ in range(len(self.players))]
@@ -95,6 +102,10 @@ class GameMaster(object):
                 if verbose:
                     print("{} loses {} points for remaining tiles: {}".format(player.name, penalty, ', '.join(player.tiles)))
                 self.player_scores[i] -= penalty
+            
+            # update q bot at end
+            if isinstance(player, QLearningPlayer):
+                player.end_game(0)
 
         if verbose:
             print(self.board)
@@ -117,5 +128,8 @@ if __name__ == '__main__':
     else:
         human_count = int(sys.argv[1])
         computer_count = int(sys.argv[2])
-        gm = GameMaster(human_count, computer_count)
+        use_q = False
+        if len(sys.argv) > 3 and sys.argv[3] == 'q':
+            use_q = True
+        gm = GameMaster(human_count, computer_count, use_q_learning=use_q)
         gm.play_game(True)

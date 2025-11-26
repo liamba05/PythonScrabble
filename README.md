@@ -30,3 +30,13 @@ At each turn, the user has the following moves.
 
 `define <WORD>` prints out the definition of a word. The English dictionary used is the best JSON dictionary I could find
 but is missing some common words.
+
+## Q-Learning Agent
+
+We added a Q-Learning bot!
+
+**Train it:**
+`python3 train_agent.py <--episodes n>` (trains for 50 games by default)
+
+**Play it:**
+`python3 game_manager.py 1 1 q` (the `q` flag enables the Q-Learning bot)
