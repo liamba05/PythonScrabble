@@ -8,7 +8,7 @@ class QLearningPlayer(ComputerPlayer):
     def __init__(self, id, init_tiles, rulebook, name=None):
         super().__init__(id, init_tiles, rulebook, name)
         self.w_file = 'q_weights.pkl'
-        self.eps = 0.1
+        self.eps = 0.01
         self.lr = 0.01
         self.gamma = 0.9
         self.w = self.load_w()
